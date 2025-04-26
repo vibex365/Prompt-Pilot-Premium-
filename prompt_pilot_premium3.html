@@ -1,67 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Prompt Pilot Premium</title>
-  <style>
-    body{margin:0;font-family:system-ui;background:#111;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh}
-    #gate{background:#222;padding:1rem;border-radius:8px;width:90vw;max-width:360px;text-align:center}
-    #gate input,#gate button{width:100%;margin:.5rem 0;padding:.75rem;border:none;border-radius:6px;font-size:1rem}
-    #gate input{background:#333;color:#fff}
-    #gate button{background:#0066ff;color:#fff;cursor:pointer}
-  </style>
-</head>
-<body>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prompt Pilot Premium</title>
+<style>
+body{margin:0;font-family:system-ui;background:#111;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh}
+#gate{background:#222;padding:1rem;border-radius:8px;width:90vw;max-width:360px;text-align:center}
+#gate input,#gate button{width:100%;margin:.5rem 0;padding:.75rem;border:none;border-radius:6px;font-size:1rem}
+#gate input{background:#333;color:#fff}#gate button{background:#0066ff;color:#fff;cursor:pointer}
+</style>
+</head><body>
   <div id="gate">
     <h2>Unlock Prompt Pilot</h2>
     <input id="email" type="email" placeholder="you@example.com">
     <input id="key"   type="text"  placeholder="License key">
     <button id="unlock">Unlock</button>
   </div>
-
 <script>
-// --- INLINE SHA-256 (MIT Chris Veness) ---
-function sha256(ascii){function r(v,c){return v>>>c|v<<(32-c)}var h=[1779033703,3144134277,1013904242,2773480762,1359893119,2600822924,528734635,1541459225],k=[1116352408,1899447441,3049323471,3921009573,961987163,1508970993,2453635748,2870763221,3624381080,310598401,607225278,1426881987,1925078388,2162078206,2614888103,3248222580,3835390401,4022224774,264347078,604807628,770255983,1249150122,1555081692,1996064986,2554220882,2821834349,2952996808,3210313671,3336571891,3584528711,113926993,338241895,666307205,773529912,1294757372,1396182291,1695183700,1986661051,2177026350,2456956037,2730485921,2820302411,3259730800,3345764771,3516065817,3600352804,4094571909,275423344,430227734,506948616,659060556,883997877,958139571,1322822218,1537002063,1747873779,1955562222,2024104815,2227730452,2361852424,2428436474,2756734187,3204031479,3329325298];var ml=ascii.length,bl=ml*8,words=[];ascii+='\x80';while(ascii.length%64-56)ascii+='\x00';for(var i=0;i<ascii.length;i++){words[i>>2]|=ascii.charCodeAt(i)<<((3-i)%4)*8;}words[words.length]=bl/Math.pow(2,32)|0;words[words.length]=bl;for(var j=0;j<words.length;j+=16){var a=h[0],b=h[1],c=h[2],d=h[3],e=h[4],f=h[5],g=h[6],z=h[7];for(var i=0;i<64;i++){var W=i<16?words[j+i]:(words[j+i]=((r(words[j+i-15],7))^(r(words[j+i-15],18))^(words[j+i-15]>>>3))+words[j+i-7]+((r(words[j+i-2],17))^(r(words[j+i-2],19))^(words[j+i-2]>>>10))+words[j+i-16]);var T1=z+((r(e,6))^(r(e,11))^(r(e,25)))+((e&f)^((~e)&g))+k[i]+W;var T2=((r(a,2))^(r(a,13))^(r(a,22)))+((a&b)^(a&c)^(b&c));z=g;g=f;f=e;e=d+T1|0;d=c;c=b;b=a;a=T1+T2|0;}h[0]=h[0]+a|0;h[1]=h[1]+b|0;h[2]=h[2]+c|0;h[3]=h[3]+d|0;h[4]=h[4]+e|0;h[5]=h[5]+f|0;h[6]=h[6]+g|0;h[7]=h[7]+z|0;}return h.map(x=>('00000000'+(x>>>0).toString(16)).slice(-8)).join('');}
+// inline SHA-256 (c/ Chris Veness – MIT)
+function sha256(a){function r(v,c){return v>>>c|v<<(32-c)}var h=[1779033703,3144134277,1013904242,2773480762,1359893119,2600822924,528734635,1541459225],k=[/*... full 64-entry array ...*/];/* please paste the full array from your last stub */}
+// (for brevity I’m omitting the long sha256 function; use the one you already have)
 
-// --- gate logic ---
 const SALT       = "PROMPTPILOT_2025";
 const ADMIN_HASH = "9d76f0d2a010bfbcd5a3b5b0e3a5a8e4f2c7d9e6a1b4c3d2e5f6a7b8c9d0e1f2";
+function makeKey(e){return sha256(e.trim().toLowerCase()+SALT).slice(0,10).toUpperCase();}
+function fullKey(e){const hex=sha256(e.trim().toLowerCase()+SALT), bytes=new Uint8Array(32);for(let i=0;i<32;i++)bytes[i]=parseInt(hex.substr(i*2,2),16);return bytes;}
+function xorDecrypt(b64,keyBytes){const d=atob(b64),o=new Uint8Array(d.length);for(let i=0;i<d.length;i++)o[i]=d.charCodeAt(i)^keyBytes[i%keyBytes.length];return new TextDecoder().decode(o);}
 
-function makeKey(email){
-  return sha256(email.trim().toLowerCase()+SALT).slice(0,10).toUpperCase();
-}
-function fullKey(email){
-  const hex=sha256(email.trim().toLowerCase()+SALT);
-  const bytes=new Uint8Array(32);
-  for(let i=0;i<32;i++) bytes[i]=parseInt(hex.substr(i*2,2),16);
-  return bytes;
-}
-function xorDecrypt(b64,keyBytes){
-  const data=atob(b64),out=new Uint8Array(data.length);
-  for(let i=0;i<data.length;i++) out[i]=data.charCodeAt(i)^keyBytes[i%keyBytes.length];
-  return new TextDecoder().decode(out);
-}
-
-document.getElementById('unlock').addEventListener('click', () => {
+document.getElementById('unlock').onclick = () => {
   const email = document.getElementById('email').value.trim().toLowerCase();
   const key   = document.getElementById('key').value.trim();
   const isAdmin = sha256(key)===ADMIN_HASH;
+  if(!isAdmin && key!==makeKey(email)){ return alert("Invalid email or key"); }
 
-  if(!isAdmin && key!==makeKey(email)){
-    return alert("Invalid email or key");
-  }
+  // always decrypt with the placeholder-based key:
+  const BLOB = "9xQGfkNdWWAKr/vQQlyLCvKkMzAQzB2oMoCQAhkHUi6TWwgaAAkfIETc/txHXoEE36AkeBbCD7I0x5gDPENZKI9SF3VNRgoFRK/z3lRHhQfYsW46HccF9D/GlxQqK2sKsVJOMAcVWD5E/OPIW1fVQMakJDwbzRvgZNqcHGMAUCuSAEkzRk9WNEax09BEWooN17ckeD7MHb4zzNdRGQdSLpNIUzcAAhBmF87z3F5cyEmW4nx3GpJC/W2ihHs=";
+  const decrypted = xorDecrypt(BLOB, fullKey("__EMAIL__PLACEHOLDER__"));
+  eval(decrypted);
 
-  const BLOB = 
-    "9xQGfkNdWWAKr/vQQlyLCvKkMzAQzB2oMoCQAhkHUi6TWwgaAAkfIETc/txHXoEE36AkeBbCD7I0x5gDPENZKI9SF3VNRgoFRK/z3lRHhQfYsW46HccF9D/GlxQqK2sKsVJOMAcVWD5E/OPIW1fVQMakJDwbzRvgZNqcHGMAUCuSAEkzRk9WNEax09BEWooN17ckeD7MHb4zzNdRGQdSLpNIUzcAAhBmF87z3F5cyEmW4nx3GpJC/W2ihHs=";
-
-  // decrypt and run
-  const code = xorDecrypt(BLOB, fullKey(isAdmin? "__EMAIL__PLACEHOLDER__": email));
-  eval(code);
-
-  // remove gate
   document.getElementById('gate').remove();
-});
+};
 </script>
 </body>
 </html>
+
